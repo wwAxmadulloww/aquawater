@@ -156,12 +156,7 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    {/* Demo credentials hint */}
-                    <div className="mt-4 p-3 bg-blue-50 rounded-xl">
-                        <p className="text-xs text-blue-700 font-medium mb-1">Demo kirish:</p>
-                        <p className="text-xs text-blue-600">Admin: +998901234567 / admin123</p>
-                        <p className="text-xs text-blue-600">Mijoz: +998901111111 / customer123</p>
-                    </div>
+
                 </div>
             </div>
         </div>
