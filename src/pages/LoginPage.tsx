@@ -33,7 +33,8 @@ export default function LoginPage() {
             navigate('/')
         },
         onError: (err: any) => {
-            const msg = err.response?.data?.message || t('common.error')
+            console.error('Login/Register error:', err)
+            const msg = err.response?.data?.message || (err.message === 'Network Error' ? 'Serverga ulanib bo\'lmadi. Internetni tekshiring.' : t('common.error'))
             toast.error(msg)
         }
     })
