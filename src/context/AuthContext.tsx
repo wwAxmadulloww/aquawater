@@ -5,7 +5,7 @@ interface User {
     _id: string
     name: string
     phone: string
-    role: 'customer' | 'admin' | 'worker' | 'courier'
+    role: 'customer' | 'admin' | 'worker' | 'courier' | 'super_admin'
     workerType?: string
     preferredLanguage: 'uz' | 'ru' | 'en'
     addresses: Array<{
@@ -22,6 +22,7 @@ interface AuthContextType {
     register: (name: string, phone: string, password: string) => Promise<void>
     logout: () => void
     isAdmin: boolean
+    isSuperAdmin: boolean
     isAuthenticated: boolean
 }
 
@@ -74,7 +75,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         <AuthContext.Provider value={{
             user, token, loading,
             login, register, logout,
-            isAdmin: user?.role === 'admin',
+            isAdmin: user?.role === 'admin' || user?.role === 'super_admin',
+            isSuperAdmin: user?.role === 'super_admin',
             isAuthenticated: !!user,
         }}>
             {children}

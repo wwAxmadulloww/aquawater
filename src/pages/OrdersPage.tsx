@@ -7,8 +7,11 @@ import { getOrders, formatPrice } from '../api/client'
 
 const STATUS_CLASSES: Record<string, string> = {
     pending: 'badge-pending',
-    accepted: 'badge-accepted',
+    confirmed: 'bg-blue-100 text-blue-700',
+    assigned: 'bg-indigo-100 text-indigo-700',
+    in_transit: 'bg-orange-100 text-orange-700',
     delivered: 'badge-delivered',
+    cancelled: 'bg-red-100 text-red-700',
 }
 
 export default function OrdersPage() {
@@ -21,8 +24,11 @@ export default function OrdersPage() {
     const getStatusLabel = (status: string) => {
         const map: Record<string, string> = {
             pending: t('orders.status.pending'),
-            accepted: t('orders.status.accepted'),
+            confirmed: t('orders.status.confirmed'),
+            assigned: t('orders.status.assigned'),
+            in_transit: t('orders.status.in_transit'),
             delivered: t('orders.status.delivered'),
+            cancelled: t('orders.status.cancelled'),
         }
         return map[status] || status
     }

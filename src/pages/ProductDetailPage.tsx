@@ -27,16 +27,6 @@ export default function ProductDetailPage() {
 
     const similar = allProducts?.filter((p: any) => p._id !== id && p.category === product?.category).slice(0, 4) || []
 
-    const isService = product.productType === 'service'
-
-    const handleAddToCart = () => {
-        const count = isService ? 1 : qty
-        for (let i = 0; i < count; i++) {
-            addItem({ _id: product._id, name: product.name, price: product.price, imageUrl: product.imageUrl })
-        }
-        toast.success(`${product.name} savatga qo'shildi!`)
-    }
-
     if (isLoading) return (
         <div className="container-custom py-10">
             <div className="animate-pulse grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -56,6 +46,16 @@ export default function ProductDetailPage() {
             Mahsulot topilmadi
         </div>
     )
+
+    const isService = product?.productType === 'service'
+
+    const handleAddToCart = () => {
+        const count = isService ? 1 : qty
+        for (let i = 0; i < count; i++) {
+            addItem({ _id: product._id, name: product.name, price: product.price, imageUrl: product.imageUrl })
+        }
+        toast.success(`${product.name} savatga qo'shildi!`)
+    }
 
     return (
         <div className="py-10">

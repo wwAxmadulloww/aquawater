@@ -1,4 +1,5 @@
 import axios from 'axios'
+import toast from 'react-hot-toast'
 
 export const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL
@@ -19,6 +20,9 @@ api.interceptors.response.use(
         if (err.response?.status === 401) {
             localStorage.removeItem('aq_token')
             window.location.href = '/login'
+        } else {
+            const msg = err.response?.data?.message || 'Xatolik yuz berdi'
+            toast.error(msg)
         }
         return Promise.reject(err)
     }

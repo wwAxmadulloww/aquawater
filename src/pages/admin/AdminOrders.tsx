@@ -5,11 +5,14 @@ import { getOrders, updateOrderStatus, deleteOrder, formatPrice, getAdminUsers, 
 import { useLanguage } from '../../i18n/LanguageContext'
 import toast from 'react-hot-toast'
 
-const STATUS_OPTIONS = ['pending', 'accepted', 'delivered']
+const STATUS_OPTIONS = ['pending', 'confirmed', 'assigned', 'in_transit', 'delivered', 'cancelled']
 const STATUS_LABELS: Record<string, string> = {
     pending: 'Kutilmoqda',
-    accepted: 'Qabul qilindi',
+    confirmed: 'Tasdiqlandi',
+    assigned: 'Kuryerga berildi',
+    in_transit: 'Yo\'lda',
     delivered: 'Yetkazildi',
+    cancelled: 'Bekor qilindi',
 }
 
 export default function AdminOrders() {
@@ -153,8 +156,11 @@ export default function AdminOrders() {
                                                 onChange={e => statusMut.mutate({ id: order._id, status: e.target.value })}
                                                 disabled={statusMut.isPending}
                                                 className={`text-xs font-medium border-0 rounded-lg py-1 px-2 cursor-pointer focus:ring-2 focus:ring-primary-500 ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                        order.status === 'accepted' ? 'bg-blue-100 text-blue-800' :
-                                                            'bg-green-100 text-green-800'
+                                                    order.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                                                        order.status === 'assigned' ? 'bg-indigo-100 text-indigo-800' :
+                                                            order.status === 'in_transit' ? 'bg-orange-100 text-orange-800' :
+                                                                order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                                                    'bg-green-100 text-green-800'
                                                     }`}
                                             >
                                                 {STATUS_OPTIONS.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}

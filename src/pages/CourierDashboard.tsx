@@ -57,10 +57,14 @@ export default function CourierDashboard() {
                                         </div>
                                     </div>
                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                                            order.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
+                                        order.status === 'in_transit' ? 'bg-orange-100 text-orange-700' :
+                                            order.status === 'assigned' ? 'bg-blue-100 text-blue-700' :
                                                 'bg-yellow-100 text-yellow-700'
                                         }`}>
-                                        {order.status === 'delivered' ? 'Yetkazilgan' : order.status === 'accepted' ? 'Qabul qilingan' : 'Kutilmoqda'}
+                                        {order.status === 'delivered' ? 'Yetkazilgan' :
+                                            order.status === 'in_transit' ? 'Yo\'lda' :
+                                                order.status === 'assigned' ? 'Biriktirilgan' :
+                                                    'Kutilmoqda'}
                                     </span>
                                 </div>
 
@@ -95,16 +99,27 @@ export default function CourierDashboard() {
                                         <p className="font-bold text-gray-900 text-lg">{formatPrice(order.items.reduce((s: number, i: any) => s + i.priceSnapshot * i.qty, 0))}</p>
                                     </div>
 
-                                    {order.status !== 'delivered' && (
-                                        <button
-                                            onClick={() => statusMut.mutate({ id: order._id, status: 'delivered' })}
-                                            disabled={statusMut.isPending}
-                                            className="btn-primary py-2.5 px-5 text-sm gap-2 whitespace-nowrap"
-                                        >
-                                            <CheckCircle2 className="w-4 h-4" />
-                                            Yetkazildi
-                                        </button>
-                                    )}
+                                    <div className="flex gap-2">
+                                        {order.status === 'assigned' && (
+                                            <button
+                                                onClick={() => statusMut.mutate({ id: order._id, status: 'in_transit' })}
+                                                disabled={statusMut.isPending}
+                                                className="btn-primary py-2.5 px-5 text-sm gap-2 whitespace-nowrap bg-orange-600 hover:bg-orange-700"
+                                            >
+                                                Yo'lga chiqdim
+                                            </button>
+                                        )}
+                                        {['assigned', 'in_transit'].includes(order.status) && (
+                                            <button
+                                                onClick={() => statusMut.mutate({ id: order._id, status: 'delivered' })}
+                                                disabled={statusMut.isPending}
+                                                className="btn-primary py-2.5 px-5 text-sm gap-2 whitespace-nowrap"
+                                            >
+                                                <CheckCircle2 className="w-4 h-4" />
+                                                Yetkazildi
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ))}
