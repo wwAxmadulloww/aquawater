@@ -86,6 +86,9 @@ export const getAdminUsers = () =>
 export const updateUserRole = (id: string, role: string, workerType?: string) =>
     api.patch(`/admin/users/${id}/role`, { role, workerType }).then(r => r.data)
 
+export const deleteAdminUser = (id: string) =>
+    api.delete(`/admin/users/${id}`).then(r => r.data)
+
 // Format currency
 export const formatPrice = (price: number) =>
     new Intl.NumberFormat('uz-UZ').format(price) + ' so\'m'

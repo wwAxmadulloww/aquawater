@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getAdminUsers, updateUserRole } from '../../api/client'
+import { getAdminUsers, updateUserRole, deleteAdminUser } from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../i18n/LanguageContext'
-import { Edit2, X, Check, ShieldAlert } from 'lucide-react'
+import { Edit2, X, Check, ShieldAlert, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface RoleModalProps {
@@ -96,12 +96,28 @@ function RoleEditModal({ user, onClose }: RoleModalProps) {
 export default function AdminUsers() {
     const { t } = useLanguage()
     const { isSuperAdmin } = useAuth()
+    const qc = useQueryClient()
     const [editingUser, setEditingUser] = useState<any>(null)
 
     const { data: users, isLoading } = useQuery({
         queryKey: ['admin-users'],
         queryFn: getAdminUsers,
     })
+
+    const { mutate: deleteMutate } = useMutation({
+        mutationFn: (id: string) => deleteAdminUser(id),
+        onSuccess: () => {
+            toast.success('Foydalanuvchi o\'chirildi')
+            qc.invalidateQueries({ queryKey: ['admin-users'] })
+        },
+        onError: () => toast.error('O\'chirishda xatolik yuz berdi')
+    })
+
+    const handleDelete = (u: any) => {
+        if (window.confirm(`${u.name}ni tizimdan butunlay o'chirib tashlamoqchimisiz?`)) {
+            deleteMutate(u._id)
+        }
+    }
 
     const getRoleBadge = (u: any) => {
         switch (u.role) {
@@ -154,7 +170,7 @@ export default function AdminUsers() {
                                     <td className="px-4 py-3">
                                         {getRoleBadge(u)}
                                     </td>
-                                    <td className="px-4 py-3 text-right">
+                                    <td className="px-4 py-3 text-right space-x-2">
                                         <button
                                             onClick={() => setEditingUser(u)}
                                             className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors inline-flex"
@@ -162,6 +178,15 @@ export default function AdminUsers() {
                                         >
                                             <Edit2 className="w-4 h-4" />
                                         </button>
+                                        {isSuperAdmin && u.role !== 'super_admin' && (
+                                            <button
+                                                onClick={() => handleDelete(u)}
+                                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors inline-flex"
+                                                title="Foydalanuvchini o'chirish"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
