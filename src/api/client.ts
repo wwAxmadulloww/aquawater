@@ -1,10 +1,19 @@
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
+const getBaseURL = () => {
+    const envUrl = import.meta.env.VITE_API_BASE_URL;
+    if (!envUrl) return 'https://aquawater-backend-ntx6.onrender.com/api';
+
+    // Remove trailing slash if present
+    const cleanUrl = envUrl.replace(/\/$/, '');
+
+    // If it already ends with /api, use it as is, otherwise append /api
+    return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+};
+
 export const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL
-        ? `${import.meta.env.VITE_API_BASE_URL}/api`
-        : 'https://aquawater-backend-ntx6.onrender.com/api',
+    baseURL: getBaseURL(),
     headers: { 'Content-Type': 'application/json' },
 })
 
