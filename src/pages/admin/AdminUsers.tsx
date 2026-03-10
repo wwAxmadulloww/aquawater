@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getAdminUsers, updateUserRole } from '../../api/client'
+import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { Edit2, X, Check, ShieldAlert } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -12,6 +13,7 @@ interface RoleModalProps {
 
 function RoleEditModal({ user, onClose }: RoleModalProps) {
     const qc = useQueryClient()
+    const { isSuperAdmin } = useAuth()
     const [role, setRole] = useState(user.role)
     const [workerType, setWorkerType] = useState(user.workerType || '')
 
@@ -53,8 +55,12 @@ function RoleEditModal({ user, onClose }: RoleModalProps) {
                             <option value="customer">Mijoz (Customer)</option>
                             <option value="worker">Ishchi (Worker)</option>
                             <option value="courier">Kuryer (Courier)</option>
-                            <option value="admin">Admin</option>
+                            {isSuperAdmin && <option value="admin">Admin</option>}
+                            {isSuperAdmin && <option value="super_admin">⚡️ Super Admin</option>}
                         </select>
+                        {!isSuperAdmin && role === 'admin' && (
+                            <p className="text-xs text-orange-600 mt-1">Adminlarni boshqarish uchun Super Admin huquqi kerak</p>
+                        )}
                     </div>
 
                     {role === 'worker' && (
@@ -73,7 +79,11 @@ function RoleEditModal({ user, onClose }: RoleModalProps) {
 
                 <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
                     <button onClick={onClose} className="btn-ghost text-sm py-2">Bekor qilish</button>
-                    <button onClick={() => mutate()} disabled={isPending} className="btn-primary text-sm py-2 gap-2">
+                    <button
+                        onClick={() => mutate()}
+                        disabled={isPending || (!isSuperAdmin && (role === 'admin' || role === 'super_admin'))}
+                        className="btn-primary text-sm py-2 gap-2"
+                    >
                         <Check className="w-4 h-4" />
                         Saqlash
                     </button>
@@ -85,6 +95,7 @@ function RoleEditModal({ user, onClose }: RoleModalProps) {
 
 export default function AdminUsers() {
     const { t } = useLanguage()
+    const { isSuperAdmin } = useAuth()
     const [editingUser, setEditingUser] = useState<any>(null)
 
     const { data: users, isLoading } = useQuery({
@@ -94,6 +105,7 @@ export default function AdminUsers() {
 
     const getRoleBadge = (u: any) => {
         switch (u.role) {
+            case 'super_admin': return <span className="bg-primary-100 text-primary-700 px-2 py-1 rounded text-xs font-bold ring-1 ring-primary-200">⚡️ Super Admin</span>
             case 'admin': return <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold">👑 Admin</span>
             case 'worker': return <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-semibold">🔧 Ishchi{u.workerType ? ` (${u.workerType})` : ''}</span>
             case 'courier': return <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-semibold">🚚 Kuryer</span>
