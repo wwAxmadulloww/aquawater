@@ -82,7 +82,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const verifyOtp = async (phone: string, code: string) => {
-        await api.post('/auth/verify-otp', { phone, code })
+        const res = await api.post('/auth/verify-otp', { phone, code })
+        if (res.data.token) {
+            const { token: t, user: u } = res.data
+            localStorage.setItem('aq_token', t)
+            setToken(t)
+            setUser(u)
+        }
     }
 
     const resendOtp = async (phone: string) => {
