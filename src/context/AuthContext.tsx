@@ -20,7 +20,8 @@ interface AuthContextType {
     token: string | null
     loading: boolean
     login: (phone: string, password: string) => Promise<void>
-    register: (name: string, phone: string, password: string) => Promise<void>
+    registerInitiate: (name: string, phone: string) => Promise<void>
+    registerComplete: (phone: string, password: string) => Promise<void>
     verifyOtp: (phone: string, code: string) => Promise<void>
     resendOtp: (phone: string) => Promise<void>
     logout: () => void
@@ -68,16 +69,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }
 
-    const register = async (name: string, phone: string, password: string) => {
-        await api.post('/auth/register', { name, phone, password })
+    const registerInitiate = async (name: string, phone: string) => {
+        await api.post('/auth/register/initiate', { name, phone })
     }
 
-    const verifyOtp = async (phone: string, code: string) => {
-        const res = await api.post('/auth/verify-otp', { phone, code })
+    const registerComplete = async (phone: string, password: string) => {
+        const res = await api.post('/auth/register/complete', { phone, password })
         const { token: t, user: u } = res.data
         localStorage.setItem('aq_token', t)
         setToken(t)
         setUser(u)
+    }
+
+    const verifyOtp = async (phone: string, code: string) => {
+        await api.post('/auth/verify-otp', { phone, code })
     }
 
     const resendOtp = async (phone: string) => {
@@ -93,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return (
         <AuthContext.Provider value={{
             user, token, loading,
-            login, register, verifyOtp, resendOtp, logout,
+            login, registerInitiate, registerComplete, verifyOtp, resendOtp, logout,
             isAdmin: user?.role === 'admin' || user?.role === 'super_admin',
             isSuperAdmin: user?.role === 'super_admin',
             isAuthenticated: !!user && user.isPhoneVerified,
