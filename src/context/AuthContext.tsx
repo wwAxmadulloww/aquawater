@@ -7,6 +7,7 @@ interface User {
     phone: string
     role: 'customer' | 'admin' | 'worker' | 'courier' | 'super_admin'
     workerType?: string
+    isPhoneVerified: boolean
     preferredLanguage: 'uz' | 'ru' | 'en'
     addresses: Array<{
         region: string; city: string; district: string
@@ -20,6 +21,8 @@ interface AuthContextType {
     loading: boolean
     login: (phone: string, password: string) => Promise<void>
     register: (name: string, phone: string, password: string) => Promise<void>
+    verifyOtp: (phone: string, code: string) => Promise<void>
+    resendOtp: (phone: string) => Promise<void>
     logout: () => void
     isAdmin: boolean
     isSuperAdmin: boolean
@@ -50,19 +53,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [token])
 
     const login = async (phone: string, password: string) => {
-        const res = await api.post('/auth/login', { phone, password })
+        try {
+            const res = await api.post('/auth/login', { phone, password })
+            const { token: t, user: u } = res.data
+            localStorage.setItem('aq_token', t)
+            setToken(t)
+            setUser(u)
+        } catch (err: any) {
+            if (err.response?.status === 403 && err.response?.data?.requiresVerification) {
+                // Return special error to be handled by LoginPage
+                throw err
+            }
+            throw err
+        }
+    }
+
+    const register = async (name: string, phone: string, password: string) => {
+        await api.post('/auth/register', { name, phone, password })
+    }
+
+    const verifyOtp = async (phone: string, code: string) => {
+        const res = await api.post('/auth/verify-otp', { phone, code })
         const { token: t, user: u } = res.data
         localStorage.setItem('aq_token', t)
         setToken(t)
         setUser(u)
     }
 
-    const register = async (name: string, phone: string, password: string) => {
-        const res = await api.post('/auth/register', { name, phone, password })
-        const { token: t, user: u } = res.data
-        localStorage.setItem('aq_token', t)
-        setToken(t)
-        setUser(u)
+    const resendOtp = async (phone: string) => {
+        await api.post('/auth/resend-otp', { phone })
     }
 
     const logout = () => {
@@ -74,10 +93,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return (
         <AuthContext.Provider value={{
             user, token, loading,
-            login, register, logout,
+            login, register, verifyOtp, resendOtp, logout,
             isAdmin: user?.role === 'admin' || user?.role === 'super_admin',
             isSuperAdmin: user?.role === 'super_admin',
-            isAuthenticated: !!user,
+            isAuthenticated: !!user && user.isPhoneVerified,
         }}>
             {children}
         </AuthContext.Provider>

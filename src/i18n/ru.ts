@@ -36,6 +36,7 @@ export const ru = {
     'products.sort.price_asc': 'Цена: от дешёвых',
     'products.sort.price_desc': 'Цена: от дорогих',
     'products.addToCart': 'В корзину',
+    'products.added': 'Добавлено в корзину',
     'products.outOfStock': 'Нет в наличии',
     'products.empty': 'Товары не найдены',
 
@@ -141,6 +142,7 @@ export const ru = {
     'common.back': 'Назад',
     'common.search': 'Поиск',
     'common.currency': 'сум',
+    'common.sum': 'сум',
 
     // Footer
     'footer.regions': 'Регионы обслуживания',

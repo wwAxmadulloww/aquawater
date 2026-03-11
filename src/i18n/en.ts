@@ -36,6 +36,7 @@ export const en = {
     'products.sort.price_asc': 'Price: Low to High',
     'products.sort.price_desc': 'Price: High to Low',
     'products.addToCart': 'Add to Cart',
+    'products.added': 'Added to cart',
     'products.outOfStock': 'Out of Stock',
     'products.empty': 'No products found',
 
@@ -141,6 +142,7 @@ export const en = {
     'common.back': 'Back',
     'common.search': 'Search',
     'common.currency': 'sum',
+    'common.sum': 'sum',
 
     // Footer
     'footer.regions': 'Regions Served',

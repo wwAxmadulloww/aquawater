@@ -1,18 +1,20 @@
 import React, { useState } from 'react'
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Package, ShoppingBag, Users, BarChart2, LogOut, Menu, X, Droplets } from 'lucide-react'
+import { MapPin, LayoutDashboard, Package, ShoppingBag, Users, BarChart2, LogOut, Menu, X, Droplets } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../i18n/LanguageContext'
 import AdminStats from './AdminStats'
 import AdminProducts from './AdminProducts'
 import AdminOrders from './AdminOrders'
 import AdminUsers from './AdminUsers'
+import AdminBranches from './AdminBranches'
 
 const NAV_ITEMS = [
     { path: '/admin', label: 'admin.stats', icon: BarChart2, exact: true },
     { path: '/admin/products', label: 'admin.products', icon: Package },
     { path: '/admin/orders', label: 'admin.orders', icon: ShoppingBag },
     { path: '/admin/users', label: 'admin.users', icon: Users },
+    { path: '/admin/branches', label: 'Filiallar', icon: MapPin },
 ]
 
 export default function AdminPage() {
@@ -37,11 +39,6 @@ export default function AdminPage() {
             </div>
             <nav className="flex-1 px-3 py-4 space-y-1">
                 {NAV_ITEMS.map(item => {
-                    const isActive = item.exact
-                        ? location.pathname === item.path
-                        : location.pathname.startsWith(item.path) && item.path !== '/admin'
-                            ? true
-                            : item.exact === undefined && location.pathname === item.path
                     const active = item.exact ? location.pathname === '/admin' : location.pathname.startsWith(item.path)
                     return (
                         <Link
@@ -49,12 +46,12 @@ export default function AdminPage() {
                             to={item.path}
                             onClick={() => setSidebarOpen(false)}
                             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${active
-                                    ? 'bg-primary-600 text-white'
-                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                ? 'bg-primary-600 text-white'
+                                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                                 }`}
                         >
                             <item.icon className="w-4 h-4 flex-shrink-0" />
-                            {t(item.label as any)}
+                            {item.label.includes('.') ? t(item.label as any) : item.label}
                         </Link>
                     )
                 })}
@@ -104,6 +101,7 @@ export default function AdminPage() {
                         <Route path="products" element={<AdminProducts />} />
                         <Route path="orders" element={<AdminOrders />} />
                         <Route path="users" element={<AdminUsers />} />
+                        <Route path="branches" element={<AdminBranches />} />
                     </Routes>
                 </main>
             </div>

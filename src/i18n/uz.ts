@@ -36,6 +36,7 @@ export const uz = {
     'products.sort.price_asc': 'Narx: arzondan',
     'products.sort.price_desc': 'Narx: qimmatdan',
     'products.addToCart': 'Savatga',
+    'products.added': 'Savatga qo\'shildi',
     'products.outOfStock': 'Tugagan',
     'products.empty': 'Mahsulot topilmadi',
 
@@ -144,6 +145,7 @@ export const uz = {
     'common.back': 'Orqaga',
     'common.search': 'Qidirish',
     'common.currency': 'so\'m',
+    'common.sum': 'so\'m',
 
     // Footer
     'footer.regions': 'Xizmat ko\'rsatiladigan hududlar',
