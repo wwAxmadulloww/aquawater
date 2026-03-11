@@ -20,10 +20,9 @@ interface AuthContextType {
     token: string | null
     loading: boolean
     login: (phone: string, password: string) => Promise<void>
-    registerInitiate: (name: string, phone: string) => Promise<void>
-    registerComplete: (phone: string, password: string) => Promise<void>
-    verifyOtp: (phone: string, code: string) => Promise<void>
-    resendOtp: (phone: string) => Promise<void>
+    sendOtp: (phone: string) => Promise<void>
+    register: (phone: string, name: string, password: string) => Promise<void>
+    verifyOtp: (phone: string, code: string) => Promise<{ token?: string }>
     logout: () => void
     isAdmin: boolean
     isSuperAdmin: boolean
@@ -54,27 +53,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [token])
 
     const login = async (phone: string, password: string) => {
-        try {
-            const res = await api.post('/auth/login', { phone, password })
-            const { token: t, user: u } = res.data
-            localStorage.setItem('aq_token', t)
-            setToken(t)
-            setUser(u)
-        } catch (err: any) {
-            if (err.response?.status === 403 && err.response?.data?.requiresVerification) {
-                // Return special error to be handled by LoginPage
-                throw err
-            }
-            throw err
-        }
+        const res = await api.post('/auth/login', { phone, password })
+        const { token: t, user: u } = res.data
+        localStorage.setItem('aq_token', t)
+        setToken(t)
+        setUser(u)
     }
 
-    const registerInitiate = async (name: string, phone: string) => {
-        await api.post('/auth/register/initiate', { name, phone })
+    const sendOtp = async (phone: string) => {
+        await api.post('/auth/send-otp', { phone })
     }
 
-    const registerComplete = async (phone: string, password: string) => {
-        const res = await api.post('/auth/register/complete', { phone, password })
+    const register = async (phone: string, name: string, password: string) => {
+        const res = await api.post('/auth/register', { phone, name, password })
         const { token: t, user: u } = res.data
         localStorage.setItem('aq_token', t)
         setToken(t)
@@ -89,10 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setToken(t)
             setUser(u)
         }
-    }
-
-    const resendOtp = async (phone: string) => {
-        await api.post('/auth/resend-otp', { phone })
+        return res.data
     }
 
     const logout = () => {
@@ -104,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return (
         <AuthContext.Provider value={{
             user, token, loading,
-            login, registerInitiate, registerComplete, verifyOtp, resendOtp, logout,
+            login, sendOtp, register, verifyOtp, logout,
             isAdmin: user?.role === 'admin' || user?.role === 'super_admin',
             isSuperAdmin: user?.role === 'super_admin',
             isAuthenticated: !!user && user.isPhoneVerified,
