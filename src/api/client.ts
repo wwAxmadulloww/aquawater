@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 
 const getBaseURL = () => {
     const envUrl = import.meta.env.VITE_API_BASE_URL;
-    if (!envUrl) return 'https://aquawater-backend-ntx6.onrender.com/api';
+    if (!envUrl) return 'https://aquawater-backend.vercel.app/api';
 
     // Remove trailing slash if present
     const cleanUrl = envUrl.replace(/\/$/, '');
