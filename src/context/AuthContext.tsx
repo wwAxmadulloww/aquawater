@@ -95,7 +95,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             login, sendOtp, register, verifyOtp, logout,
             isAdmin: user?.role === 'admin' || user?.role === 'super_admin',
             isSuperAdmin: user?.role === 'super_admin',
-            isAuthenticated: !!user && user.isPhoneVerified,
+            // Gating on isPhoneVerified locked out every account created before
+            // the flag existed (and every seeded account): login succeeded, the
+            // token was stored, then each protected route bounced back to /login.
+            // Phone verification is enforced server-side at registration when
+            // REQUIRE_PHONE_VERIFICATION is on, so having a session is enough here.
+            isAuthenticated: !!user,
         }}>
             {children}
         </AuthContext.Provider>

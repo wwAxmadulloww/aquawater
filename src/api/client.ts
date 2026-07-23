@@ -15,6 +15,9 @@ const getBaseURL = () => {
 export const api = axios.create({
     baseURL: getBaseURL(),
     headers: { 'Content-Type': 'application/json' },
+    // A cold-starting free-tier backend can take ~30s to answer the first
+    // request; without a timeout the UI spins forever when it is down.
+    timeout: 45000,
 })
 
 api.interceptors.request.use((config) => {
@@ -28,9 +31,22 @@ api.interceptors.response.use(
     (err) => {
         if (err.response?.status === 401) {
             localStorage.removeItem('aq_token')
-            window.location.href = '/login'
+            // Guard against a redirect loop: the login page itself issues 401s
+            // (wrong password), and a hard reload there would discard the toast.
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login'
+                return Promise.reject(err)
+            }
+            toast.error(err.response?.data?.message || 'Telefon raqami yoki parol noto\'g\'ri')
+        } else if (err.code === 'ECONNABORTED' || !err.response) {
+            toast.error('Serverga ulanib bo\'lmadi. Internetni tekshiring.')
         } else {
-            const msg = err.response?.data?.message || 'Xatolik yuz berdi'
+            const data = err.response?.data
+            // Zod validation failures come back as { errors: [...] }, which
+            // previously fell through to the generic message.
+            const msg = data?.message
+                || (Array.isArray(data?.errors) && data.errors[0]?.message)
+                || 'Xatolik yuz berdi'
             toast.error(msg)
         }
         return Promise.reject(err)
